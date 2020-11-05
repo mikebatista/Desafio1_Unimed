@@ -1,15 +1,13 @@
 # Automação Unimed
 
-Projeto de desafio enviado pela Noeses para fins de admissão.
+Projeto de desafio para fins de admissão.
 
-## Tecnologias Utilizadas
+## Pré-requisitos
 
- - Eclipse
- - JAVA
- - Cucumber
- - JUnit
+ - JDK 8+
+ - Eclipse IDE
 
-## Utilização
+## Instalação
 
-A execução do script inicia na classe 'UnimedTest.class' localizada no pacote "com.noesis.runners".
-As evidências do teste são geradas na pasta "Evidencias" localizada na raiz do projeto.
+ - Clone este repositório para sua máquina local
+usando https://github.com/mikebatista/Desafio1_Unimed.git
