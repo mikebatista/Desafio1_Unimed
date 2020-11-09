@@ -10,8 +10,9 @@ import cucumber.api.junit.Cucumber;
 @CucumberOptions(
 		features = "src/resource/features/buscarMedico.feature",
 		glue = "com.noesis.steps",
-		tags = "@teste1",
-		plugin = "pretty",
+		plugin = { "pretty", 
+				"html:evidencias/cucumber-reports",
+				"junit:evidencias/cucumber-reports/Cucumber.xml"},
 		monochrome = true,
 		snippets = SnippetType.CAMELCASE,
 		strict = false

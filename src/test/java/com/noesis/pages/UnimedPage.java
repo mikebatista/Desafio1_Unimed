@@ -3,15 +3,10 @@ package com.noesis.pages;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -22,13 +17,15 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.noesis.steps.UnimedElementMap;
-import com.noesis.steps.UnimedSteps;
+import com.noesis.elements.UnimedElementMap;
+import com.noesis.utils.ReportPDF;
 
 public class UnimedPage extends UnimedElementMap {
 
 	public static WebDriver webDriver;
 	WebDriverWait wait;
+	static String folderExecutionDate;
+
 
 	public UnimedPage abrirNavegador() {
 		System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\driver\\chromedriver.exe");
@@ -48,13 +45,13 @@ public class UnimedPage extends UnimedElementMap {
 
 	public UnimedPage acessarSiteUnimed() {
 		webDriver.navigate().to("https://www.unimed.coop.br/");
-		screenShot();
+		ReportPDF.addImage(imagem(),"Pagina Inicial");
 		return this;
 	}
 
 	public UnimedPage clicarMenuGuiaMedico() {
 		webDriver.findElement(menuGuiaMedico).click();
-		screenShot();
+		ReportPDF.addImage(imagem(),"Menu Guia Médico");
 		return this;
 	}
 
@@ -66,32 +63,34 @@ public class UnimedPage extends UnimedElementMap {
 	public UnimedPage informarEspecialidade(String especialidade) {
 		wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(inputCampoPesquisa));
 		webDriver.findElement(inputCampoPesquisa).sendKeys(especialidade);
-		screenShot();
+		ReportPDF.addImage(imagem(),"Informando especialidade");
 		return this;
 	}
 
 	public UnimedPage clicarEmPesquisar() {
-		webDriver.findElement(By.id("btn_pesquisar")).click();
+		webDriver.findElement(btnPesquisar).click();
 		return this;
 	}
 
 	public UnimedPage selecionarEstado(String estado) throws InterruptedException {
 		webDriver.findElement(campoEstado).click();
-		webDriver.findElement(By.xpath("//*[contains(text(),'" + estado + "')]")).click();
+		webDriver.findElement(By.xpath("//div[contains(text(),'" + estado + "')]")).click();
 		return this;
 	}
 
 	public UnimedPage selecionarCidade(String cidade) throws InterruptedException {
 		webDriver.findElement(campoCidade).click();
-		Thread.sleep(3000);
-		webDriver.findElement(By.xpath("//*[contains(text(),'" + cidade + "')]")).click();
+		// Thread.sleep(3000);
+		wait.until(ExpectedConditions
+				.presenceOfAllElementsLocatedBy(By.xpath("//div[contains(text(),'" + cidade + "')]")));
+		webDriver.findElement(By.xpath("//div[contains(text(),'" + cidade + "')]")).click();
 		return this;
 	}
 
 	public UnimedPage selecionarUnidade() {
 		wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(unidade));
 		webDriver.findElement(unidade).click();
-		screenShot();
+		ReportPDF.addImage(imagem(),"Selecionando Unidade");
 		return this;
 	}
 
@@ -99,9 +98,11 @@ public class UnimedPage extends UnimedElementMap {
 		webDriver.findElement(btnContinuar).click();
 		return this;
 	}
+
 	// Este map armazena a lista de resultados encontrados para a pesquisar
 	public static Map<String, String> mapEnderecos = new HashMap<String, String>();
 
+	@SuppressWarnings("unused")
 	public UnimedPage listarResultado() {
 		try {
 			// Mapeamentos
@@ -121,16 +122,16 @@ public class UnimedPage extends UnimedElementMap {
 			for (int linha = 1; linha < listOfElements.size(); linha++) {
 				listaMedicosXpath = "(//div[@class='resultado-resumido padding relative']/h4)[" + linha + "]";
 				medico = webDriver.findElement(By.xpath(listaMedicosXpath)).getText();
-				System.out.println(medico);
+				//System.out.println(medico);
 
 				enderecoResultadoXpath = "(//div[@class='resultado-resumido padding relative']//span[@id='txt_endereco']/p[1])["
 						+ linha + "]";
 				enderecoMedico = webDriver.findElement(By.xpath(enderecoResultadoXpath)).getText();
 				mapEnderecos.put("R" + linha, enderecoMedico);
-				System.out.println(enderecoMedico + "\n");
+				//System.out.println(enderecoMedico + "\n");
 
 			}
-			screenShot();
+			ReportPDF.addImage(imagem(),"Resultados da busca");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -145,6 +146,7 @@ public class UnimedPage extends UnimedElementMap {
 		}
 		return this;
 	}
+
 	public UnimedPage validarNaoContemEndereco(String estado) {
 		// percorre o map verifica se apresentou algum endereço de São Paulo
 		for (String key : mapEnderecos.keySet()) {
@@ -153,22 +155,10 @@ public class UnimedPage extends UnimedElementMap {
 		}
 		return this;
 	}
-	
-	/**
-	 * Faz uma captura de tela e armazena na pasta evidências
-	 */
-	public UnimedPage screenShot() {
-		LocalDateTime agora = LocalDateTime.now();
-		DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HHmmss");
-		String horaFormatada = formatterHora.format(agora);
-		File imagem = ((TakesScreenshot) webDriver).getScreenshotAs(OutputType.FILE);
-		String path = System.getProperty("user.dir") + "\\evidencias\\"
-		+UnimedSteps.folderEvidenceName+"\\imagem"+horaFormatada+".png";
-		try {
-			FileUtils.copyFile(imagem, new File(path));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return this;
+
+	public byte[] imagem() {
+		TakesScreenshot ts = (TakesScreenshot) webDriver;
+		byte[] screenshot = ts.getScreenshotAs(OutputType.BYTES);
+		return screenshot;
 	}
 }
