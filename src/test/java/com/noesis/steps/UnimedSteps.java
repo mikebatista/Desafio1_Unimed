@@ -15,12 +15,9 @@ import cucumber.api.java.pt.Quando;
 
 public class UnimedSteps {
 	UnimedPage unimedPage;
-	// nome do diretorio onde serão armazenados as evidencias do teste
-	public static String folderEvidenceName = "";
 
 	@Before
 	public void antes(Scenario scenario) {
-		folderEvidenceName = scenario.getName();
 		ReportPDF.openPDF();
 		unimedPage = new UnimedPage();
 		unimedPage.abrirNavegador();

@@ -15,19 +15,18 @@ import com.itextpdf.text.pdf.PdfWriter;
 public class ReportPDF {
 
 	static Document document = new Document();
-	static Font font = new Font(FontFamily.HELVETICA, 12, Font.BOLD);
+	static Font font = new Font(FontFamily.HELVETICA, 12, Font.NORMAL);
 
 	public static void openPDF() {
 
 		try {
-			String path = System.getProperty("user.dir") + "\\evidencias\\";
-			String File = path+ "report.pdf";
-			System.out.println(path+"aaaaa.fpd");
+			String folder = System.getProperty("user.dir") + "\\evidencias\\";
+			String name = "EvidenceReport.pdf";
+			String File = folder+ name;
 			PdfWriter.getInstance(document, new FileOutputStream(File));
 			document.open();
 			document.addAuthor("Michael Batista");
 			document.addTitle("Teste automatizado com BDD");
-			// document.addSubject("Descrição do projeto");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -43,19 +42,17 @@ public class ReportPDF {
 			preface.setAlignment(Element.ALIGN_CENTER);
 			Image img = Image.getInstance(screanshot);
 			img.scaleToFit((float)(PageSize.A4.getWidth()*0.85), (float)(PageSize.A4.getHeight() *0.85));
-			//img.scaleToFit((PageSize.A4.getWidth()),(PageSize.A4.getHeight()));
-			
+			//cria uma tabela
 			PdfPTable table = new PdfPTable(1);
-			
-			
 		    table.setWidthPercentage(100);
 		 
+		   //Cria uma celula para agrupar o texto
 		    PdfPCell cell1 = new PdfPCell();
 		    cell1.setMinimumHeight(50);
 		    cell1.setVerticalAlignment(Element.ALIGN_MIDDLE);
 		    cell1.addElement(preface);
 		    table.addCell(cell1);
-		    
+		  //Cria uma celula para agrupar a imagem
 		    PdfPCell cell2 = new PdfPCell();
 		    cell2.setMinimumHeight(50);
 		    cell2.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -64,7 +61,6 @@ public class ReportPDF {
 		    
 		    document.add(table);
 		    document.add(new Paragraph(""));
-			
 			
 
 		} catch (Exception e) {
